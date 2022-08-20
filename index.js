@@ -32,7 +32,8 @@ async function invokeAction({ action, id, name, email, phone }) {
       break;
 
     case "remove":
-      await logger.removeContact(id);
+      const removedContact = await logger.removeContact(id);
+      if (!removedContact) throw new Error(`Contact with id:${id} not found!`);
       console.table(await logger.listContacts());
       break;
 

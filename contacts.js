@@ -28,8 +28,11 @@ async function getContactById(contactId) {
 async function removeContact(contactId) {
   try {
     const contacts = await listContacts();
+    const idx = contacts.findIndex((item) => item.id === contactId);
+    if (idx === -1) return null;
     const updatedContacts = contacts.filter(({ id }) => id !== contactId);
     await fs.writeFile(contactsPath, JSON.stringify(updatedContacts));
+    return contacts[idx];
   } catch (error) {
     console.error(error);
   }
@@ -41,6 +44,7 @@ async function addContact(name, email, phone) {
     const contacts = await listContacts();
     const updatedContacts = [...contacts, newContact];
     await fs.writeFile(contactsPath, JSON.stringify(updatedContacts), "utf8");
+    return newContact;
   } catch (error) {
     onsole.error(error);
   }
