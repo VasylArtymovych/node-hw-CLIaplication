@@ -6,8 +6,9 @@ const contactsPath = path.resolve("db/contacts.json");
 
 async function listContacts() {
   try {
-    const contacts = await fs.readFile(contactsPath, "utf8");
-    console.table(JSON.parse(contacts));
+    const data = await fs.readFile(contactsPath, "utf8");
+    const contacts = JSON.parse(data);
+    return contacts;
   } catch (error) {
     console.error(error);
   }
@@ -15,11 +16,9 @@ async function listContacts() {
 
 async function getContactById(contactId) {
   try {
-    const contacts = await fs.readFile(contactsPath, "utf8");
-    const necessaryContact = JSON.parse(contacts).filter(
-      ({ id }) => id === contactId
-    );
-    console.log(necessaryContact);
+    const contacts = await listContacts();
+    const necessaryContact = contacts.find(({ id }) => id === contactId);
+    return necessaryContact;
   } catch (error) {
     console.error(error);
   }
@@ -27,12 +26,9 @@ async function getContactById(contactId) {
 
 async function removeContact(contactId) {
   try {
-    const contacts = await fs.readFile(contactsPath, "utf8");
-    const updatedContacts = JSON.parse(contacts).filter(
-      ({ id }) => id !== contactId
-    );
-    await fs.writeFile(contactsPath, JSON.stringify(updatedContacts), "utf8");
-    listContacts();
+    const contacts = await listContacts();
+    const updatedContacts = contacts.filter(({ id }) => id !== contactId);
+    await fs.writeFile(contactsPath, JSON.stringify(updatedContacts));
   } catch (error) {
     console.error(error);
   }
@@ -41,10 +37,9 @@ async function removeContact(contactId) {
 async function addContact(name, email, phone) {
   try {
     const newContact = { id: uuidv4(), name, phone, email };
-    const contacts = await fs.readFile(contactsPath, "utf8");
-    const updatedContacts = [...JSON.parse(contacts), newContact];
+    const contacts = await listContacts();
+    const updatedContacts = [...contacts, newContact];
     await fs.writeFile(contactsPath, JSON.stringify(updatedContacts), "utf8");
-    listContacts();
   } catch (error) {
     onsole.error(error);
   }
